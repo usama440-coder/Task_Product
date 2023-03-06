@@ -17,8 +17,19 @@ const addProduct = async (req, res, next) => {
       description: req.body.description,
       price: req.body.price,
       image: req.file.filename,
+      name_ar: req.body.name_ar,
+      description_ar: req.body.description_ar,
     };
-    if (!data.name || !data.description || !data.price || !data.image) {
+
+    // console.log(data);
+    if (
+      !data.name ||
+      !data.description ||
+      !data.price ||
+      !data.image ||
+      !data.name_ar ||
+      !data.description_ar
+    ) {
       throw new AppError("Required Fields not provided", 400);
     }
 
@@ -41,7 +52,8 @@ const addProduct = async (req, res, next) => {
 // @route   GET /api/v1/product
 const getAllProducts = async (req, res, next) => {
   try {
-    const result = await getProducts();
+    const { lang } = req.query;
+    const result = await getProducts(lang);
     res.status(200).json({ success: true, data: result });
   } catch (error) {
     res.statusCode = 400;
@@ -53,17 +65,12 @@ const getAllProducts = async (req, res, next) => {
 // @route   GET /api/v1/product/:id
 const getSingleProduct = async (req, res, next) => {
   try {
-    const result = await getProduct(req.params.id);
+    const { lang } = req.query;
+    let result = await getProduct(req.params.id, lang);
     if (result.length === 0) {
       throw new AppError("No product found", 404);
     }
-
-    const data = {
-      id: result[0].id,
-      name: result[0].name,
-      description: result[0].description,
-      image: result[0].image,
-    };
+    const data = result[0];
 
     res.status(200).json({ success: true, data });
   } catch (error) {
@@ -101,10 +108,12 @@ const deleteSingleProduct = async (req, res, next) => {
 // @route   UPDATE /api/v1/product/:id
 const updateSingleProduct = async (req, res, next) => {
   try {
-    const name = req.body.name;
-    const description = req.body.description;
-    const price = req.body.price;
+    const name = req.body?.name;
+    const description = req?.body?.description;
+    const price = req.body?.price;
     const image = req.file?.filename;
+    const name_ar = req.body?.name_ar;
+    const description_ar = req.body?.description_ar;
 
     // product exist
     const productExists = await getProduct(req.params.id);
@@ -116,6 +125,12 @@ const updateSingleProduct = async (req, res, next) => {
     // update
     if (name) {
       product.name = name;
+    }
+    if (name_ar) {
+      product.name_ar = name_ar;
+    }
+    if (description_ar) {
+      product.description_ar = description_ar;
     }
     if (description) {
       product.description = description;

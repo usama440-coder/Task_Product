@@ -8,10 +8,10 @@ const productRouter = require("./routes/product.route");
 const bodyParser = require("body-parser");
 
 // middleware
+app.use(cors());
+app.use("/public", express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
-app.use("/", express.static("public"));
 
 // routes
 app.use("/api/v1/user", userRouter);

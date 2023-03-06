@@ -3,8 +3,15 @@ const { pool } = require("../db/db");
 const createProduct = (data) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      "INSERT INTO PRODUCTS (name, description, price, image) VALUES (?, ?, ?, ?)",
-      [data.name, data.description, data.price, data.image],
+      "INSERT INTO PRODUCTS (name, description, price, image, name_ar, description_ar) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        data.name,
+        data.description,
+        data.price,
+        data.image,
+        data.name_ar,
+        data.description_ar,
+      ],
       (err, result) => {
         if (err) {
           return reject(err);
@@ -15,9 +22,15 @@ const createProduct = (data) => {
   });
 };
 
-const getProducts = () => {
+const getProducts = (lang) => {
+  let query;
+  if (lang === "ar") {
+    query = "SELECT id, name_ar, description_ar, price, image FROM PRODUCTS";
+  } else {
+    query = "SELECT id, name, description, price, image FROM PRODUCTS";
+  }
   return new Promise((resolve, reject) => {
-    pool.query("SELECT * FROM PRODUCTS", (err, result) => {
+    pool.query(query, (err, result) => {
       if (err) {
         return reject(err);
       }
@@ -26,9 +39,16 @@ const getProducts = () => {
   });
 };
 
-const getProduct = (id) => {
+const getProduct = (id, lang) => {
+  let query;
+  if (lang === "ar") {
+    query =
+      "SELECT id, name_ar, description_ar, price, image FROM PRODUCTS WHERE id=?";
+  } else {
+    query = "SELECT * FROM PRODUCTS WHERE id=?";
+  }
   return new Promise((resolve, reject) => {
-    pool.query("SELECT * FROM PRODUCTS WHERE ID=?", [id], (err, result) => {
+    pool.query(query, [id], (err, result) => {
       if (err) {
         return reject(err);
       }

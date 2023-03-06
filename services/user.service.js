@@ -44,4 +44,19 @@ const getUser = (email) => {
   });
 };
 
-module.exports = { createUser, getUsers, getUser };
+const getUserId = (id) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      "SELECT id, name, email, password, joining FROM USERS WHERE id=?",
+      [id],
+      (err, result, fields) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(result);
+      }
+    );
+  });
+};
+
+module.exports = { createUser, getUsers, getUser, getUserId };

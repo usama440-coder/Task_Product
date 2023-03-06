@@ -13,6 +13,11 @@ const registerUser = async (req, res, next) => {
       throw new AppError("Required fields not provided", 400);
     }
 
+    const isExists = await getUser(email);
+    if (isExists.length !== 0) {
+      throw new AppError("User already exists", 400);
+    }
+
     // bcrypt password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = bcrypt.hashSync(password, salt);

@@ -9,6 +9,7 @@ const {
   updateSingleProduct,
 } = require("../controllers/product.controller");
 const path = require("path");
+const { protect } = require("../middleware/auth.middleware");
 
 const storage = multer.diskStorage({
   destination: "./public/img/",
@@ -24,30 +25,10 @@ const upload = multer({
   storage: storage,
 });
 
-// const upload = multer({
-//   storage: storage,
-//   limits: { fileSize: 1000000 },
-//   fileFilter: (req, file, cb) => {
-//     checkFileType(file, cb);
-//   },
-// }).single("productImage");
-
-// const checkFileType = (file, cb) => {
-//   const filetypes = /jpeg|jpg|png|gif/;
-//   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-//   const mimetype = filetypes.test(file.mimetype);
-
-//   if (mimetype && extname) {
-//     return cb(null, true);
-//   } else {
-//     cb("Error: Images only!");
-//   }
-// };
-
-productRouter.post("/", upload.single("image"), addProduct);
-productRouter.get("/", getAllProducts);
-productRouter.get("/:id", getSingleProduct);
-productRouter.delete("/:id", deleteSingleProduct);
-productRouter.put("/:id", upload.single("image"), updateSingleProduct);
+productRouter.post("/", protect, upload.single("image"), addProduct);
+productRouter.get("/", protect, getAllProducts);
+productRouter.get("/:id", protect, getSingleProduct);
+productRouter.delete("/:id", protect, deleteSingleProduct);
+productRouter.put("/:id", protect, upload.single("image"), updateSingleProduct);
 
 module.exports = productRouter;
